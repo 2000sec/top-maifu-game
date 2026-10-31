@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TOP登陆少年 · 卖腐系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== 像素字体 @font-face (汉字像素风兜底) ===== */
+        @font-face {
+            font-family: 'PixelCJK';
+            src: local('DotGothic16'), local('Zpix'), local('Unifont');
+        }
+
+        /* ===== CSS变量 / 设计Token ===== */
+        :root {
+            --pink-0: #fff0f5;
+            --pink-1: #ffd6e7;
+            --pink-2: #ffadd1;
+            --pink-3: #e88aaa;
+            --pink-4: #c96080;
+            --pink-5: #8b3358;
+            --cream: #fff8f0;
+            --gold: #f5c842;
+            --gold-dark: #c8960a;
+            --shadow: #c96080;
+            --border: 3px solid var(--pink-3);
+            --pixel-r: 0px;
+        }
+
+        /* ===== 重置 ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            image-rendering: pixelated;
+        }
+
+        /* ===== 背景：像素点阵纹理 ===== */
+        body {
+            background-color: #ffe4f0;
+            background-image:
+                linear-gradient(rgba(200, 96, 128, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 96, 128, 0.07) 1px, transparent 1px);
+            background-size: 16px 16px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 12px 40px;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+        }
+
+        /* ===== 像素装饰：浮动背景元素 ===== */
+        body::before {
+            content: '★ ♥ ✿ ★ ♥ ✿ ★ ♥ ✿ ★ ♥ ✿ ★ ♥ ✿ ★ ♥ ✿';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            font-size: 13px;
+            color: rgba(200, 96, 128, 0.18);
+            letter-spacing: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            padding: 6px 0;
+            pointer-events: none;
+            font-family: monospace;
+        }
+
+        /* ===== 主容器：像素窗口风格 ===== */
+        .game-container {
+            max-width: 680px;
+            width: 100%;
+            background: var(--pink-0);
+            border: 3px solid var(--pink-3);
+            box-shadow:
+                4px 0 0 0 var(--pink-3),
+                0 4px 0 0 var(--pink-3),
+                4px 4px 0 0 var(--shadow),
+                8px 8px 0 0 rgba(200, 96, 128, 0.25);
+            position: relative;
+            padding: 0 0 16px;
+            margin-top: 8px;
+        }
+
+        /* 像素窗口标题栏 */
+        .window-titlebar {
+            background: var(--pink-3);	
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px solid var(--pink-5);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--pink-5);
+            background: var(--pink-1);
+            display: inline-block;
+        }
+
+        .window-dot:first-child {
+            background: #ffb3c6;
+        }
+        .window-dot:nth-child(2) {
+            background: #ffd6a5;
+        }
+        .window-dot:nth-child(3) {
+            background: #b5ead7;
+        }
+
+        .window-title-text {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--pink-0);
+            letter-spacing: 2px;
+            font-family: 'Pixelify Sans', monospace;
+            text-shadow: 1px 1px 0 var(--pink-5);
+        }
+
+        /* ===== 像素装饰条带 ===== */
+        .pixel-band {
+            height: 6px;
+            background: repeating-linear-gradient(90deg,
+                    var(--pink-2) 0px,
+                    var(--pink-2) 8px,
+                    var(--pink-1) 8px,
+                    var(--pink-1) 16px,
+                    var(--pink-3) 16px,
+                    var(--pink-3) 24px,
+                    var(--gold) 24px,
+                    var(--gold) 32px);
+        }
+
+        /* ===== 内容区 ===== */
+        .game-inner {
+            padding: 16px 20px 0;
+        }
+
+        /* ===== 顶部信息栏 ===== */
+        .meta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .role-tag {
+            background: var(--pink-3);
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 4px 14px 5px;
+            border: 2px solid var(--pink-5);
+            box-shadow: 2px 2px 0 var(--pink-5);
+            font-family: 'Pixelify Sans', monospace;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .week-tag {
+            background: var(--gold);
+            color: var(--pink-5);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px 5px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 2px 2px 0 var(--gold-dark);
+            font-family: 'Pixelify Sans', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 故事面板 ===== */
+        .story-panel {
+            background: var(--cream);
+            border: 2px solid var(--pink-3);
+            box-shadow: 3px 3px 0 var(--shadow);
+            padding: 16px 18px;
+            min-height: 120px;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        /* 角落像素装饰 */
+        .story-panel::before,
+        .story-panel::after {
+            content: '◆';
+            position: absolute;
+            font-size: 8px;
+            color: var(--pink-3);
+            font-family: monospace;
+        }
+        .story-panel::before {
+            top: 4px;
+            left: 4px;
+        }
+        .story-panel::after {
+            bottom: 4px;
+            right: 4px;
+        }
+
+        .story-text {
+            color: #5a2d42;
+            font-size: 0.88rem;
+            line-height: 1.85;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+        }
+
+        .story-text strong {
+            color: var(--pink-4);
+            font-weight: 800;
+        }
+
+        /* ===== 数值面板 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: var(--pink-1);
+            border: 2px solid var(--pink-3);
+            box-shadow: 2px 2px 0 var(--shadow);
+            padding: 8px 4px 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* 像素角标 */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 6px;
+            background: var(--pink-3);
+        }
+
+        .stat-label {
+            font-size: 0.58rem;
+            font-weight: 700;
+            color: var(--pink-4);
+            margin-bottom: 2px;
+            font-family: 'Pixelify Sans', monospace;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--pink-5);
+            line-height: 1.1;
+            font-family: 'Pixelify Sans', monospace;
+            text-shadow: 1px 0 0 var(--pink-3), 0 1px 0 var(--pink-3);
+        }
+
+        .stat-bar {
+            margin-top: 5px;
+            height: 6px;
+            background: var(--pink-2);
+            border: 1px solid var(--pink-3);
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.2s steps(10);
+        }
+
+        .fill-health {
+            background: #ff6b9d;
+        }
+        .fill-skill {
+            background: #ff9eb5;
+        }
+        .fill-accept {
+            background: #c96080;
+        }
+        .fill-fans {
+            background: var(--gold);
+        }
+
+        /* ===== 像素分隔线 ===== */
+        .divider {
+            height: 4px;
+            background: repeating-linear-gradient(90deg,
+                    var(--pink-3) 0px, var(--pink-3) 6px,
+                    transparent 6px, transparent 10px);
+            margin: 2px 0 14px;
+        }
+
+        /* ===== 按钮共用基础 ===== */
+        .px-btn {
+            background: var(--pink-1);
+            border: 2px solid var(--pink-3);
+            box-shadow: 3px 3px 0 var(--shadow);
+            padding: 12px 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--pink-5);
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            text-align: center;
+            line-height: 1.5;
+            transition: box-shadow 0.05s, transform 0.05s;
+            display: block;
+            width: 100%;
+            position: relative;
+        }
+
+        .px-btn:hover {
+            background: var(--pink-2);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow);
+        }
+
+        .px-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--shadow);
+        }
+
+        /* ===== 行动按钮组 ===== */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .action-btn {
+            composes: px-btn;
+            background: var(--pink-1);
+            border: 2px solid var(--pink-3);
+            box-shadow: 3px 3px 0 var(--shadow);
+            padding: 13px 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--pink-5);
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            text-align: center;
+            line-height: 1.5;
+            transition: box-shadow 0.05s, transform 0.05s;
+            position: relative;
+        }
+
+        .action-btn::after {
+            content: '▶';
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            font-size: 7px;
+            color: var(--pink-3);
+            font-family: monospace;
+        }
+
+        .action-btn:hover {
+            background: var(--pink-2);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow);
+        }
+
+        .action-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--shadow);
+        }
+
+        /* ===== 队友选择 ===== */
+        .teammate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .teammate-btn {
+            background: var(--pink-1);
+            border: 2px solid var(--pink-3);
+            box-shadow: 3px 3px 0 var(--shadow);
+            padding: 14px 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--pink-5);
+            cursor: pointer;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            text-align: center;
+            line-height: 1.5;
+            transition: box-shadow 0.05s, transform 0.05s;
+            letter-spacing: 0.5px;
+        }
+
+        .teammate-btn:hover {
+            background: var(--pink-2);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow);
+        }
+
+        .teammate-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--shadow);
+        }
+
+        .back-btn {
+            grid-column: span 2;
+            background: var(--cream);
+            border-color: var(--pink-2);
+            color: var(--pink-4);
+            box-shadow: 3px 3px 0 var(--pink-2);
+        }
+
+        /* ===== 页脚 ===== */
+        footer {
+            font-size: 0.62rem;
+            text-align: center;
+            padding: 12px 0 4px;
+            color: var(--pink-4);
+            border-top: 2px dashed var(--pink-2);
+            margin: 14px 20px 0;
+            letter-spacing: 1.5px;
+            font-family: 'Pixelify Sans', monospace;
+            font-weight: 600;
+        }
+
+        /* ===== 像素装饰SVG元素 ===== */
+        .px-deco-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 8px 0 4px;
+            color: var(--pink-3);
+            font-size: 12px;
+            font-family: monospace;
+            letter-spacing: 6px;
+            opacity: 0.65;
+        }
+
+        /* ===== 首页 ===== */
+        .home-title {
+            text-align: center;
+            padding: 10px 0 6px;
+        }
+
+        .home-title .main {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--pink-4);
+            letter-spacing: 2px;
+            line-height: 1.4;
+            font-family: 'Pixelify Sans', monospace;
+            text-shadow: 2px 2px 0 var(--pink-2), 1px 1px 0 var(--pink-3);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .home-title .main-jp {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-shadow: 2px 0 0 var(--gold-dark), 0 2px 0 var(--gold-dark), 2px 2px 0 var(--gold-dark);
+            letter-spacing: 3px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .home-title .sub {
+            font-size: 0.72rem;
+            color: var(--pink-4);
+            letter-spacing: 0.8px;
+            line-height: 1.7;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+        }
+
+        /* ===== 结局样式 ===== */
+        .ending-title {
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--pink-4);
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            letter-spacing: 1px;
+        }
+
+        .ending-body {
+            font-size: 0.85rem;
+            line-height: 1.9;
+            padding: 0 4px;
+            color: #5a2d42;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .restart-btn,
+        .preview-btn {
+            background: var(--pink-3);
+            border: 2px solid var(--pink-5);
+            box-shadow: 3px 3px 0 var(--pink-5);
+            padding: 13px 28px;
+            font-weight: 700;
+            color: white;
+            font-size: 0.88rem;
+            cursor: pointer;
+            font-family: 'Pixelify Sans', 'PingFang SC', 'Microsoft YaHei', monospace;
+            letter-spacing: 1px;
+            transition: box-shadow 0.05s, transform 0.05s;
+            margin: 8px auto;
+            display: block;
+            text-shadow: 1px 1px 0 var(--pink-5);
+        }
+
+        .restart-btn:hover,
+        .preview-btn:hover {
+            background: var(--pink-4);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--pink-5);
+        }
+
+        .restart-btn:active,
+        .preview-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--pink-5);
+        }
+
+        /* ===== 像素角落装饰 SVG ===== */
+        .corner-deco {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* ===== 像素星星/爱心装饰行 ===== */
+        .deco-strip {
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-align: center;
+            color: var(--pink-3);
+            opacity: 0.5;
+            padding: 2px 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* ===== 侧边装饰条 ===== */
+        .side-deco-left,
+        .side-deco-right {
+            position: absolute;
+            top: 40px;
+            font-family: monospace;
+            font-size: 10px;
+            color: var(--pink-2);
+            writing-mode: vertical-rl;
+            letter-spacing: 6px;
+            pointer-events: none;
+            line-height: 1;
+        }
+        .side-deco-left {
+            left: -20px;
+            text-orientation: mixed;
+        }
+        .side-deco-right {
+            right: -20px;
+            transform: rotate(180deg);
+        }
+
+        /* ===== 闪烁动画（像素感，仅关键帧切换）===== */
+        @keyframes pixelBlink {
+            0%,
+            49% {
+                opacity: 1;
+            }
+            50%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .blink {
+            animation: pixelBlink 1.1s steps(1) infinite;
+        }
+
+        /* ===== 像素进度点 ===== */
+        .week-pip-row {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin: 6px 0 10px;
+        }
+
+        .week-pip {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--pink-3);
+            display: inline-block;
+        }
+
+        .week-pip.filled {
+            background: var(--pink-3);
+        }
+        .week-pip.current {
+            background: var(--gold);
+            border-color: var(--gold-dark);
+        }
+
+        /* ================================================================
+           角色选择页面专用：标题背景块 — 保持用户之前的紧凑调整
+           ================================================================ */
+        .role-select-title {
+            min-height: auto !important;
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+            padding: 2px 14px !important;
+            box-shadow: 3px 3px 0 var(--shadow) !important;
+        }
+
+        .role-select-title .story-text {
+            font-size: 0 !important;
+        }
+
+        .role-select-title .home-title {
+            padding: 0 !important;
+            text-align: center !important;
+        }
+
+        .role-select-title .home-title .main-jp {
+            font-size: 1.35rem !important;
+            margin-bottom: 0 !important;
+            line-height: 1.2 !important;
+            display: block !important;
+        }
+
+        .role-select-title .home-title .main {
+            font-size: 1.05em !important;
+            margin-bottom: 0 !important;
+            line-height: 1.2 !important;
+            display: block !important;
+        }
+
+        .role-select-title .home-title .sub {
+            font-size: 0.75rem !important;
+            line-height: 1.3 !important;
+            margin-top: 1px !important;
+            text-align: center !important;
+            display: block !important;
+            letter-spacing: 0.6px !important;
+        }
+
+        /* ================================================================
+           角色选择页面专用：按钮更小 + 间距更松散
+           ================================================================ */
+        .role-select-grid {
+            gap: 18px !important;
+            margin-top: 8px !important;
+        }
+
+        .role-select-grid .teammate-btn {
+            padding: 10px 8px !important;
+            font-size: 0.78rem !important;
+            box-shadow: 2px 2px 0 var(--shadow) !important;
+            border-width: 2px !important;
+            line-height: 1.3 !important;
+        }
+
+        .role-select-grid .teammate-btn .role-icon {
+            font-size: 0.9rem !important;
+            margin-bottom: 1px !important;
+            display: block !important;
+            color: var(--pink-4) !important;
+        }
+
+        .role-select-grid .teammate-btn .role-name {
+            font-size: 0.8rem !important;
+            display: block !important;
+            font-weight: 700 !important;
+            color: var(--pink-5) !important;
+        }
+
+        .role-select-grid .teammate-btn .role-sub {
+            font-size: 0.5rem !important;
+            margin-top: 1px !important;
+            letter-spacing: 0.5px !important;
+            display: block !important;
+            color: var(--pink-3) !important;
+        }
+
+        /* 角色选择页面装饰条间距 */
+        .role-select-deco {
+            margin: 6px 0 14px !important;
+        }
+
+        /* 响应式：手机 */
+        @media (max-width: 540px) {
+            .role-select-title {
+                padding: 2px 12px !important;
+                margin-top: 1px !important;
+                margin-bottom: 1px !important;
+            }
+            .role-select-title .home-title .main-jp {
+                font-size: 1.1rem !important;
+                line-height: 1.1 !important;
+            }
+            .role-select-title .home-title .main {
+                font-size: 0.8rem !important;
+                line-height: 1.1 !important;
+            }
+            .role-select-title .home-title .sub {
+                font-size: 0.6rem !important;
+                line-height: 1.2 !important;
+                margin-top: 0 !important;
+            }
+
+            .role-select-grid {
+                gap: 14px !important;
+                margin-top: 6px !important;
+            }
+            .role-select-grid .teammate-btn {
+                padding: 8px 6px !important;
+                font-size: 0.7rem !important;
+            }
+            .role-select-grid .teammate-btn .role-icon {
+                font-size: 0.8rem !important;
+            }
+            .role-select-grid .teammate-btn .role-name {
+                font-size: 0.72rem !important;
+            }
+            .role-select-grid .teammate-btn .role-sub {
+                font-size: 0.45rem !important;
+            }
+            .role-select-deco {
+                margin: 4px 0 10px !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .role-select-title {
+                padding: 2px 10px !important;
+            }
+            .role-select-title .home-title .main-jp {
+                font-size: 0.95rem !important;
+            }
+            .role-select-title .home-title .main {
+                font-size: 0.7rem !important;
+            }
+            .role-select-title .home-title .sub {
+                font-size: 0.52rem !important;
+                line-height: 1.1 !important;
+            }
+
+            .role-select-grid {
+                gap: 10px !important;
+                margin-top: 4px !important;
+            }
+            .role-select-grid .teammate-btn {
+                padding: 6px 4px !important;
+                font-size: 0.65rem !important;
+            }
+            .role-select-grid .teammate-btn .role-icon {
+                font-size: 0.7rem !important;
+            }
+            .role-select-grid .teammate-btn .role-name {
+                font-size: 0.65rem !important;
+            }
+            .role-select-grid .teammate-btn .role-sub {
+                font-size: 0.4rem !important;
+                margin-top: 0 !important;
+            }
+            .role-select-deco {
+                margin: 2px 0 8px !important;
+            }
+        }
+
+        /* ===== 其他全局响应式 ===== */
+        @media (max-width: 540px) {
+            .game-inner {
+                padding: 12px 12px 0;
+            }
+            .stat-value {
+                font-size: 1.35rem;
+            }
+            .stats-grid {
+                gap: 6px;
+            }
+            .action-buttons {
+                gap: 8px;
+            }
+            .home-title .main-jp {
+                font-size: 1.3rem;
+            }
+            .home-title .main {
+                font-size: 1.1rem;
+            }
+            .story-text {
+                font-size: 0.82rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .game-inner {
+                padding: 10px 10px 0;
+            }
+            .stat-value {
+                font-size: 1.15rem;
+            }
+            .stat-label {
+                font-size: 0.52rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        /* ============================================================
+           像素装饰生成工具
+        ============================================================ */
+        function makeDecoStrip(icons = '★ ♥ ✿ ● ◆ ～', repeat = 3) {
+            return `<div class="deco-strip">${(icons + '  ').repeat(repeat)}</div>`;
+        }
+
+        function makeWeekPips(week, total = 16) {
+            let dots = '';
+            for (let i = 1; i <= total; i++) {
+                if (i < week) dots += `<span class="week-pip filled"></span>`;
+                else if (i === week) dots += `<span class="week-pip current blink"></span>`;
+                else dots += `<span class="week-pip"></span>`;
+            }
+            return `<div class="week-pip-row">${dots}</div>`;
+        }
+
+        function makeWindowTitlebar(title = 'TOP') {
+            return `
+        <div class="window-titlebar">
+            <div class="window-dots">
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+            </div>
+            <span class="window-title-text">${title}</span>
+        </div>
+        <div class="pixel-band"></div>`;
+        }
+
+        /* ============================================================
+           游戏核心状态 (不变)
+        ============================================================ */
+        let game = {
+            playerId: null,
+            playerName: '',
+            week: 1,
+            life: 50,
+            skill: 50,
+            teamAccept: 50,
+            fans: 50,
+            soloFans: 30,
+            cpFans: 20,
+            groupFans: 20,
+            favor: { zx: 50, zby: 50, zj: 50, zh: 50, sxh: 50 },
+            relation: {
+                zx_zby: 50,
+                zx_zj: 50,
+                zx_zh: 50,
+                zx_sxh: 60,
+                zby_zj: 85,
+                zby_zh: 82,
+                zby_sxh: 20,
+                zj_zh: 65,
+                zj_sxh: 85,
+                zh_sxh: 70
+            },
+            coldWarRemain: 3,
+            sabotageSuccess: 0,
+            consecutiveTrain: 0,
+            zx_noSuCounter: 0,
+            sxh_noZxCounter: 0,
+            lastSpecialEvent: false,
+            nextEventWeek: 2,
+            gameOver: false,
+            ending: null,
+            lastAction: null,
+            lastTarget: null,
+            earlyWarningUsed: false,
+            cpCounts: { zx: 0, zby: 0, zj: 0, zh: 0, sxh: 0 },
+            rumorTriggered: false
+        };
+
+        const roles = {
+            zx: { name: '朱志鑫', life: 50, skill: 35, accept: 50, fans: 62, soloBase: 72, cpBase: 54, groupBase: 49 },
+            zby: { name: '张泽禹', life: 50, skill: 70, accept: 42, fans: 64, soloBase: 75, cpBase: 58, groupBase: 47 },
+            zj: { name: '张极', life: 70, skill: 50, accept: 60, fans: 56, soloBase: 63, cpBase: 50, groupBase: 47 },
+            zh: { name: '左航', life: 35, skill: 50, accept: 70, fans: 58, soloBase: 65, cpBase: 53, groupBase: 47 },
+            sxh: { name: '苏新皓', life: 40, skill: 60, accept: 35, fans: 66, soloBase: 78, cpBase: 58, groupBase: 49 }
+        };
+
+        /* ============================================================
+           卖腐剧情池 (不变)
+        ============================================================ */
+        const cpStories = {
+            zx: {
+                zby: [
+                    "你们被分到一组做料理，张泽禹把盐当成糖放进了蛋糕里，你尝了一口表情扭曲，他有些紧张，不停眨眼，你却笑着说「好吃」，他愣了一下，然后笑得眼睛都眯起来。",
+                    "录制团综玩「你画我猜」，张泽禹的提示你一个都没看懂，拿了全场最低分下场，你小心翼翼地去看他，发现他整笑意盈盈地看着你。",
+                    "只有你们的双人舞台，张泽禹掀开盖着镜头的布，眼睛亮亮的冲着镜头唱歌，你下意识看向了大屏幕，那一刻你成了千千万万的观众之一，忘记了自己也在表演。",
+                    "彩排时你忘了一句词，张泽禹做着奇怪的手势替你提词，眉眼弯弯，你顺利接上后笑着看他，他冲你眨了眨眼睛。"
+                ],
+                zj: [
+                    "录综艺玩石头剪刀布，输的人要去做一个鬼脸，你输了一局，刚准备做，张极突然冲镜头做了个巨丑无比的鬼脸，全场爆笑。",
+                    "录制物料玩小游戏，两个人一对视就爆笑不止，最后两个人被留下来单独做惩罚，虽然下班时间晚了，但是真的好好笑。",
+                    "后台化妆间你困得直点头，张极拍了拍自己的肩膀说「靠着我睡会儿吧，我帮你盯着时间」，你迷迷糊糊靠过去，居然真的睡着了。",
+                    "你们被安排一起拍双人小卡，摄影师让「亲密一点」，张极直接揽住你的肩说「这样行吗」，你愣了一秒然后配合地笑了。"
+                ],
+                zh: [
+                    "体能训练你累得瘫在地上，左航走过来拉了你一把说「别放弃啊」，他的手心很热，眼神里有一种让人安心的坚定，你借着他的力站了起来。",
+                    "你们被安排拍双人海报，摄影师让靠近一些，左航自然地揽住你的肩膀说「这样行吗」，你看着他坦然的动作愣了一下，然后配合地笑了。",
+                    "左航半夜敲你的门说失眠了，你们坐在阳台聊天，他聊起小时候在山里看星星的事，你说「下次带我去看看」，他说「好」——那个「好」字轻得像一片羽毛。",
+                    "录节目开车你紧张得手心出汗，左航从后座探出脑袋，很轻地问你「闷了？」。"
+                ],
+                sxh: [
+                    "彩排时你差点被线绊倒，苏新皓一把扶住你的腰，低声说「小心点」。他的手指在你腰上多停留了一秒，你感觉那一小块皮肤在发烫。",
+                    "直播时粉丝让你们对视十秒，你坐在原地等着身边的队友让出座位，忽然想起练习生时期你们也是这样对视过，那时候他说「我们会一起出道的」，现在你们真的做到了，但他也不再坐在你的身边了。",
+                    "公司年会你们坐在一起，苏新皓突然在桌下轻轻踢了你的脚一下，你转头看他，他用手机打了行字给你看：「新年快乐，朱志鑫」，然后很快删掉了。",
+                    "新年音乐会你们被安排合唱，排练时苏新皓突然说「你是我最信任的人」，你愣住不知道怎么接，他补了一句「别多想，就是……真的」，声音越来越小。",
+                    "拍双人杂志时摄影师让你们「亲密一点」，苏新皓直接靠在你背上，你感觉到他的心跳，也不知道是谁的心跳更快一些，快门声在耳边响成一片。"
+                ]
+            },
+            zby: {
+                zx: [
+                    "录物料的时候你抱着一只狗，手掌轻轻揉着狗头，朱志鑫突然把手盖到了你的手背上，你不知道发生了什么。",
+                    "你们在练习室练到凌晨，朱志鑫突然说「饿不饿」，然后变魔术似的从包里掏出两包泡面，你们蹲在地上分着吃。",
+                    "你们在练习室即兴合奏，你弹吉他他唱歌，唱到一半他忘词了，他笑着看你，你也笑了，然后你们一起乱唱了一整段，录下来发现还挺好听。",
+                    "运动会选队友，朱志鑫第一个选了你，你看着他很有神采的眼睛，欣然走到他身边「那我很幸运啊」"
+                ],
+                zj: [
+                    "录制物料玩喷水游戏时，张极冲到了你的前面，帮你挡住了大部分的水流攻击，游戏结束，其余四人浑身湿透，只有你浑身干爽——你看着他湿漉漉的背影，想说谢谢却哽在喉咙。",
+                    "排练时你们被分到双人舞段，全程没有交流，但你的手碰到他的手时，他微微颤了一下，那个瞬间你们谁都没有躲开。",
+                    "游戏环节你输了要接受惩罚，做五十个俯卧撑，你累了一天实在不想做，正在和工作人员讨价还价，张极突然说「我替他吧」，全场安静了三秒，你看着他，他别过脸不看你。",
+                    "张极在排练时总是偷偷学你的动作，你发现了故意跳错，他跟着你跳错，两个人在镜子里对视，然后又挪开视线。",
+                    "录节目你们抽到了一起去西餐厅吃饭，蜡烛牛排古典音乐，吃着吃着两个人突然对视上了，一瞬间不知道该说些什么。"
+                ],
+                zh: [
+                    "你心情不好的时候左航总是第一个发现，他不会问你怎么了，只是默默坐到你旁边，然后说「我陪你练会儿舞吧」，你们就真的跳了一整晚，累到躺在地上喘气。",
+                    "录制综艺时，每个成员可以问彼此一个问题，左航问你，觉得这个团里看起来最酷但实际很傻的人是谁？左航的眼光闪烁，你看见了，但还是转头说「朱志鑫」。",
+                    "你比赛输了心情低落，左航陪你打了三小时游戏，最后你终于笑了，他说「开心了就好」。",
+                    "你在车上睡着了，头歪到左航肩上，左航僵住没动，一直到下车才轻轻拍醒他，你问他「你怎么不叫我」，左航说「你睡得挺香」。"
+                ],
+                sxh: [
+                    "公司安排你们一起拍短视频，导演让「互动亲密一点」，你们对视了三秒然后同时笑了——真的不太熟，但这个笑反而让导演觉得「很有化学反应」。",
+                    "苏新皓在练习时帮你纠正了一个动作，你们之间虽然话不多，但他的指导很专业，你默默记在心里，觉得他其实是个很认真的人。",
+                    "录制物料时你们被分到一组做游戏，为了赢你们不得不牵手转圈，结束后你们迅速松开，不出所料，播出时弹幕上一片「陪」。",
+                    "苏新皓半夜发了条朋友圈说「失眠」，你鬼使神差地评论了「+1」，然后他私聊你说「要出来买泡面吗」，你们在便利店偶遇，各自买了泡面坐在门口吃完，全程没说几句话，但意外地不尴尬。",
+                    "你们被要求合唱一首抒情歌，排练时总是笑场，但最后一次对唱时，你看着他认真的眼神，忽然觉得或许你们之间没有想象中那么陌生。"
+                ]
+            },
+            zj: {
+                zx: [
+                    "录制物料玩小游戏，两个人一对视就爆笑不止，最后两个人被留下来单独做惩罚，虽然下班时间晚了，但是真的好好笑。",
+                    "你们一起直播，弹幕问「最想和谁去旅行」，你脱口而出「朱志鑫」，说完自己都愣了，然后找补说「因为他比较笨」。",
+                    "朱志鑫在练习室一遍遍扣动作，你走过去跟着他一起练，什么也没说，后来朱志鑫停下来看了你一眼，你笑着说「我陪你啊」",
+                    "你们被分到一组做团综任务，朱志鑫全程护着你，你摔了他第一个来扶，你赢了比赛他比你还开心，你看着他兴奋的样子，觉得这个队长当得真称职。"
+                ],
+                zby: [
+                    "录制团综时你摔了一跤，玩游戏的时候磕磕碰碰都很正常，大家都不怎么在意。中场休息的时候你抱着腿在角落里玩手机，张泽禹凑过来，眼睛里居然写满了担忧，他问「还痛不痛？」。",
+                    "公司让你们拍双人海报，摄影师说「稍微靠近一点」，你往前走了一步，张泽禹也往前走了一步，你们的肩膀碰到一起，谁都没有再动，像是被定格了。",
+                    "录节目要你说关系最好的人是谁，你看了看张泽禹，张泽禹脸上什么表情都没有，看上去完全不在意这个答案，你刚要开口，张泽禹突然问「是两个字还是三个字？」",
+                    "你和张泽禹在楼道里看之前跳舞的视频，其中有一个是你之前跳的女团舞，张泽禹看着你，有点调笑意味地让你现场跳。你还是跳了，因为好像听见他喊你「哥哥」。",
+                    "过生日的时候张泽禹念他给你写的信，又写到了小时候两个人一起漂洋过海在重庆打拼，你觉得有点无聊，因为已经过去很多年，而且都已经到了北京。但是听见他说「我想陪你把异乡走成故乡」。"
+                ],
+                zh: [
+                    "左航教你重庆话，你说得乱七八糟，他笑到蹲在地上说「你笨惨了张极」，但下次还是继续教你，教到你会说一句完整的「你好乖哦」才罢休。",
+                    "左航在车上睡着了，头歪向你这边，你轻轻托住他的脑袋，他醒了一下，迷迷糊糊说「别闹」，然后继续睡，你发现他睫毛很长。",
+                    "你们一起去游乐园，左航非要坐过山车，你陪他坐了三次，下来的时候两个人腿都是软的，但笑得特别开心。",
+                    "拍物料让其他人蒙眼，你去点一下最好的朋友的后背。你走到左航的身后本来想点他，却看见他伸出手点了一下旁边的张泽禹。"
+                ],
+                sxh: [
+                    "你们一起拍双人杂志，摄影师让你们对视，你看着他，他看了一会儿忽然笑了，你说「你笑什么」，他说「你眼神太认真了，我有点不习惯」，你愣了一下，然后也笑了。",
+                    "游戏输了你必须公主抱苏新皓，还要一边说出他十个缺点，莫名其妙地，你说出了「你嘴巴好亲你们一起拍双人杂志，摄影师让你们对视，你看着他，他看了一会儿忽然笑了，你说「你笑什么」。",
+                    "你生日那天苏新皓送了你一双鞋，你说「太贵了」，他说「你值得好的」，你看着他的眼睛，觉得这个朋友没白交。",
+                    "跟苏新皓的双人舞台，苏新皓坐在你旁边弹钢琴，表情很严肃，但你突然觉得他好可爱，莫名喊了他一句「新皓宝宝」，他害羞的表情很夸张，但也很可爱。"
+                ]
+            },
+            zh: {
+                zx: [
+                    "你在写词，朱志鑫坐在旁边玩手机，你写了一个多小时，他就安静地坐了一个多小时。你写完一段抬起头看他，他说「写完了？那走吧」，你问他「你不无聊吗」，他说「还好，看你写东西挺有意思的」。",
+                    "公司团建你们被分到一个房间，睡前聊天聊到凌晨三点，你说「我以前不太敢跟你说话」，他问「为什么」，你说「因为你太帅了」，然后两个人笑成一团。",
+                    "你录节目忘词了，朱志鑫在台下给你比口型，你看着他那副着急的样子，忽然就不紧张了，顺利接上了词，下台后他重重地拍了一下你的肩膀说「吓死我了」。",
+                    "你们一起打球，你赢了比赛冲他做了个鬼脸，他追着你满场跑，最后两个人累得躺在球场上喘气，他看着天花板说「跟你一起玩真开心」。"
+                ],
+                zby: [
+                    "张泽禹弹吉他你打鼓，你们在练习室里录了好多首demo，虽然都没发表，但那些录音是你最珍贵的回忆，偶尔翻出来听还是会笑。",
+                    "训练的时候你打鼓总是卡不上拍，他笑着帮你打拍子说「再来一遍」，你重新来，他认真听着，结束后他说「完美」，你心里踏实了。",
+                    "玩游戏的时候你们分到了一组，配合默契，张泽禹虽然蒙着眼睛攻击力依旧无敌，两个人都玩得很开心。",
+                    "拍物料被问到「什么时候会觉得安心」，你想了想说是半夜惊醒但发现张泽禹的房门还微微开着，透着光的时候。"
+                ],
+                zj: [
+                    "拍物料玩蒙眼抓人游戏，轮到张极的时候你爬到了窗户上面躲着，张极抓累了坐到那扇窗户的窗台前，游戏结束，张极摘掉眼罩，你从窗户下跳下来，张极身边的窗纱被你带出来的风吹开了一瞬。",
+                    "你们一起拍舞蹈视频，有一个动作需要你托着他，他跳上来时你差点没接住，他笑着说「你行不行啊」，你咬牙说「行」，然后真的完成了。",
+                    "你比赛输了心情低落，张极什么话也没说就默默陪着你，你看着他强撑着困意的样子，觉得好像一只小猪。",
+                    "你在采访里被问到「最可靠的队友」，你想了想说「张极吧，因为他总是笑着」，张极看那个采访的时候正在喝水，差点呛到。"
+                ],
+                sxh: [
+                    "苏新皓给你编了首曲子，你说「这歌好适合我」，他说「就是为你写的」，你愣住，他已经转过去调音了。",
+                    "录制完团综已经很晚了，大家都累得不想说话，你靠在车座上刷手机，苏新皓坐在你旁边，过了一会儿你感觉他往你这边靠了靠，你侧头看，他已经睡着了，头几乎要滑到你肩上，你没动，就那么坐了一路，下车时他醒了，揉揉眼睛说「到了啊」，你「嗯」了一声。",
+                    "有一天你在休息室坐着发呆的时候，苏新皓走过来，把手机递给你说「你帮我看看这段剪得怎么样」，你接过来看了一会儿，发现里面有一段是上周你们一起录的日常，剪得很随意，但你看着看着心情就好了一些。",
+                    "你们在练习室一起练舞，有一段动作需你配合把苏新皓托起来，你托着他的时候发现他比想象中轻。"
+                ]
+            },
+            sxh: {
+                zx: [
+                    "你们被分到双人采访，工作人员问「对彼此的第一印象」，你说「他在练习生里就是那种很耀眼的人」，朱志鑫转头看了你一眼，你继续说「但现在发现他其实挺小孩的」，他笑了，你也笑了，工作人员追问「现在还这么觉得吗？」，你们两个人一下子都安静了。",
+                    "你们一起拍双人舞视频，有一个动作需要朱志鑫搂住你的腰，你拍完后心跳得厉害，抬头看见他若无其事地走开。",
+                    "朱志鑫在采访里说「苏新皓是我最想感谢的人」，你看到那个视频的时候正在吃饭，筷子掉了一根，你捡起来，发现手指也在抖。",
+                    "你们又被安排双人舞台，两个人都没什么心思排练，但是不管是声音还是舞步都好合拍，练习都不需要的合拍。",
+                    "你们在宿舍看恐怖片，你被吓到的时候下意识抓住了他的胳膊，他反手握住了你的手，一直到电影结束都没有松开，你们谁都没有提这件事。"
+                ],
+                zby: [
+                    "你们被分到一组创作，一开始气氛很尬，但写着写着发现你们对音乐的理解出奇相似，那天你们聊到凌晨四点，关系莫名拉近了很多。",
+                    "张泽禹在你编曲的时候坐在旁边听，你问他「怎么样」，他说「很棒」，你怀疑他是不是在敷衍，他说「真的，我鸡皮疙瘩都起来了」，你发现他手臂上确实有鸡皮疙瘩。",
+                    "粉丝投票让你们一起直播，你全程都在笑——不是因为尴尬，是因为他真的挺有趣的，你没想到你们这么合拍。",
+                    "你们在便利店碰到，他买了两瓶养乐多，递给你一瓶说「给你」，你问「你怎么知道我喜欢喝这个」，他说「上次看你喝过」，你发现他记性真的很好。",
+                    "年终总结时你们互相评价，你说「他是个很认真的人」，他说「他也是」——简单但真诚，你们对视了一眼，然后各自移开了目光。"
+                ],
+                zj: [
+                    "你心情不好的时候张极什么也没问，只是拉着你去天台吹风，你们并排坐着，他说「你看，今晚星星好多」，你顺着他的手指看过去，忽然觉得心里没那么堵了。",
+                    "你们一起练舞练到很晚，张极给你带了夜宵，说「我猜你肯定没吃饭」，你接过那碗热腾腾的馄饨，觉得这个人真的很会照顾人。",
+                    "张极在采访里说「苏新皓是我最好的朋友」，你看到后截图发给他，他回「本来就是啊」，你盯着那行字笑了很久，然后把截图收藏了。",
+                    "你们在便利店买冰淇淋，他买了你最喜欢的口味递给你说「给你的」，你接过来说「你怎么知道我喜欢这个」，他说「上次你买的就是这个啊」——你没想到他连这种小事都记得。"
+                ],
+                zh: [
+                    "你胃疼得不想动，窝在沙发里刷手机，过了一会儿张泽禹走过来，默默放了一盒胃药和一壶热水在你面前，什么也没说就走了。你看着那盒药，发现是你常吃的那种牌子，你都不知道他什么时候注意到的。",
+                    "团综分组你们被分到一起，你们配合得出奇默契，任务结束后左航跟你击掌，说「咱俩还行嘛」，你笑着说「那以后多合作」，他说「行啊」，那个「行啊」说得特别随意，但你记了好久。",
+                    "你们在阳台吹风，苏新皓突然说「我觉得你有时候想太多了」，你看了他一眼，他继续说「但也挺正常的，谁不想呢」，你没接话，但你知道他在说他自己，你接了一句「你也别想太多」，他愣了一下，然后笑了。",
+                    "左航说自己睡醒脸上总有猫毛，你给他送了一台宠物专用空气净化器。"
+                ]
+            }
+        };
+
+
+        /* ============================================================
+           工具函数
+        ============================================================ */
+        function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        function getStory(playerId, targetId) {
+            const stories = cpStories[playerId];
+            if (!stories) return "你们相视一笑，空气里弥漫着微妙的默契。";
+            const list = stories[targetId];
+            if (!list || list.length === 0) return "你们在走廊擦肩而过，谁都没说话，但好像什么都说了。";
+            return pickRandom(list);
+        }
+
+        /* ============================================================
+           核心逻辑 (不变)
+        ============================================================ */
+        function initGame(roleId) {
+            const role = roles[roleId];
+            game.playerId = roleId;
+            game.playerName = role.name;
+            game.life = role.life;
+            game.skill = role.skill;
+            game.teamAccept = role.accept;
+            game.fans = role.fans;
+            game.soloFans = role.soloBase;
+            game.cpFans = role.cpBase;
+            game.groupFans = role.groupBase;
+            const initFavor = {
+                zx: { zx: 50, zby: 45, zj: 45, zh: 45, sxh: 60 },
+                zby: { zx: 45, zby: 50, zj: 85, zh: 82, sxh: 20 },
+                zj: { zx: 45, zby: 85, zj: 50, zh: 65, sxh: 85 },
+                zh: { zx: 45, zby: 82, zj: 65, zh: 50, sxh: 70 },
+                sxh: { zx: 60, zby: 20, zj: 85, zh: 70, sxh: 50 }
+            };
+            game.favor = { ...initFavor[roleId] };
+            game.relation = { zx_zby: 50, zx_zj: 50, zx_zh: 50, zx_sxh: 60, zby_zj: 85, zby_zh: 82, zby_sxh: 20,
+            zj_zh: 65, zj_sxh: 85, zh_sxh: 70 };
+            game.coldWarRemain = 3;
+            game.sabotageSuccess = 0;
+            game.consecutiveTrain = 0;
+            game.zx_noSuCounter = 0;
+            game.sxh_noZxCounter = 0;
+            game.lastSpecialEvent = false;
+            game.nextEventWeek = 2;
+            game.gameOver = false;
+            game.ending = null;
+            game.week = 1;
+            game.lastAction = null;
+            game.lastTarget = null;
+            game.earlyWarningUsed = false;
+            game.cpCounts = { zx: 0, zby: 0, zj: 0, zh: 0, sxh: 0 };
+            game.rumorTriggered = false;
+            recalcTeamAccept();
+            recalcFansFromStruct();
+        }
+
+        function recalcFansFromStruct() {
+            game.fans = Math.min(100, Math.max(0, Math.floor(game.soloFans * 0.5 + game.cpFans * 0.3 + game.groupFans *
+            0.2)));
+        }
+
+        function recalcTeamAccept() {
+            const pid = game.playerId;
+            let others = ['zx', 'zby', 'zj', 'zh', 'sxh'].filter(id => id !== pid);
+            let total = 0;
+            for (let oid of others) {
+                let val = game.favor[oid],
+                    coef = 1;
+                if (val > 80) coef = 1.5;
+                if (val < 20) coef = 1.3;
+                total += val * coef;
+            }
+            game.teamAccept = Math.min(100, Math.max(0, Math.floor(total / others.length)));
+        }
+
+        function modFavor(targetId, delta) {
+            game.favor[targetId] = Math.min(100, Math.max(0, game.favor[targetId] + delta));
+            recalcTeamAccept();
+        }
+
+        function modFanStruct(dSolo, dCp, dGroup) {
+            game.soloFans = Math.min(100, Math.max(0, game.soloFans + dSolo));
+            game.cpFans = Math.min(100, Math.max(0, game.cpFans + dCp));
+            game.groupFans = Math.min(100, Math.max(0, game.groupFans + dGroup));
+            recalcFansFromStruct();
+        }
+
+        function modLife(delta) { game.life = Math.min(100, Math.max(0, game.life + delta)); }
+
+        function modSkill(delta) { game.skill = Math.min(100, Math.max(0, game.skill + delta)); }
+
+        function triggerRandomEvent() {
+            const events = [
+                { name: "公司内小考", desc: "月考排名靠后，压力山大", effect: () => { modSkill(-3);
+                        modLife(-2);
+                        modFanStruct(0, 0, -1); } },
+                { name: "公开演唱会", desc: "舞台表现亮眼，圈粉无数", effect: () => { modSkill(2);
+                        modFanStruct(1, 2, 2);
+                        modLife(1); } },
+                { name: "粉丝跟车", desc: "私生跟车，惊吓又疲惫", effect: () => { modLife(-5);
+                        modFanStruct(-1, 0, -1); } },
+                { name: "杂志双人拍摄", desc: "和队友营业擦出火花", effect: () => { let r = Math.random() > 0.5 ? 2 : -2;
+                        modFanStruct(-1, 3, 1);
+                        modLife(r); } },
+                { name: "新歌分part争议", desc: "歌词分配引发粉圈大战", effect: () => { modFanStruct(-2, 1, -1);
+                        modLife(-2); } }
+            ];
+            let ev = events[Math.floor(Math.random() * events.length)];
+            ev.effect();
+            return { name: ev.name, desc: ev.desc };
+        }
+
+        function advanceWeek(performEventCheck = true) {
+            game.week++;
+            if ((game.playerId === 'zby' || game.playerId === 'zj') && game.coldWarRemain > 0) game.coldWarRemain--;
+            if (game.playerId === 'zh' && game.life < 15) game.life = 0;
+            if (game.life <= 0 || game.skill <= 0 || game.teamAccept <= 0 || game.fans <= 0) game.gameOver = true;
+            if (game.week > 16) return;
+            if (!game.gameOver && game.week <= 16 && performEventCheck && game.week % 2 === 0 && game.week >= game
+                .nextEventWeek) {
+                const eventRes = triggerRandomEvent();
+                game.nextEventWeek = game.week + 2;
+                return eventRes;
+            }
+            return null;
+        }
+
+        function checkEnding() {
+            if (game.gameOver) {
+                if (game.life <= 0) return "身体不适退团";
+                if (game.teamAccept <= 0) return "霸凌全团";
+                if (game.skill <= 0 && game.teamAccept > 80) return "卖腐丧志";
+                if (game.fans <= 0) return "无人在意";
+                return "遗憾退场";
+            }
+            if (game.week > 16) {
+                if ((game.playerId === 'zby' || game.playerId === 'sxh') && game.favor[game.playerId === 'zby' ? 'sxh' :
+                        'zby'] > 60) return "我磕了对家x我的cp";
+                if (game.fans <= 40) return "皇子登基";
+                let maxCp = 0;
+                for (let id of ['zx', 'zby', 'zj', 'zh', 'sxh'])
+                    if (id !== game.playerId && game.cpCounts[id] > maxCp) maxCp = game.cpCounts[id];
+                if (maxCp >= 4 && game.skill > 10) return "美帝姐的胜利";
+                let allMoreThan2 = ['zx', 'zby', 'zj', 'zh', 'sxh'].filter(id => id !== game.playerId).every(id => game
+                    .cpCounts[id] >= 2);
+                if (allMoreThan2 && game.skill > 10) return "端水之神降临";
+                if (game.sabotageSuccess >= 3) return "钮祜禄";
+                if (game.skill > 80 && game.teamAccept > 80 && game.fans > 80) return "全能ACE";
+                let allMid = [game.life, game.skill, game.teamAccept, game.fans].every(v => v >= 40 && v <= 60);
+                if (allMid) return "平淡是真";
+                let allHighFavor = ['zx', 'zby', 'zj', 'zh', 'sxh'].filter(id => id !== game.playerId).every(id => game
+                    .favor[id] >= 80);
+                if (game.teamAccept > 90 && allHighFavor) return "真爱永恒";
+                return "平稳着陆";
+            }
+            return null;
+        }
+
+        function checkRumorTrigger(target, isSixTimes) {
+            if (game.rumorTriggered || game.gameOver) return false;
+            if (isSixTimes) {
+                if (game.playerId === 'zby' && target === 'sxh') return false;
+                if (game.playerId === 'sxh' && target === 'zby') return false;
+                return true;
+            }
+            let hasMax = ['zx', 'zby', 'zj', 'zh', 'sxh'].some(id => id !== game.playerId && game.favor[id] >= 100);
+            if (hasMax && Math.random() < 0.25) return true;
+            return false;
+        }
+
+        /* ============================================================
+           动作执行 (不变)
+        ============================================================ */
+        function performAction(action, subTarget = null) {
+            if (game.gameOver || game.week > 16) return;
+            let actionLog = "",
+                storyText = "";
+
+            if (game.playerId === 'zh' && action === 'train') {
+                game.consecutiveTrain = (game.consecutiveTrain || 0) + 1;
+                if (game.consecutiveTrain >= 3) {
+                    game.life = 0;
+                    game.gameOver = true;
+                    renderGameOverScreen("连续高强度训练，身体彻底垮了……不得不退团休养。");
+                    return;
+                }
+            } else { game.consecutiveTrain = 0; }
+
+            if ((game.playerId === 'zby' || game.playerId === 'zj') && game.week <= 3 && action === 'cp' && subTarget === (
+                    game.playerId === 'zby' ? 'zj' : 'zby')) {
+                actionLog = "⚠ 冷战期间主动卖腐，两人好感骤降！CP粉愤怒脱粉。";
+                modFavor(subTarget, -8);
+                modFanStruct(-4, -6, -1);
+                storyText = getStory(game.playerId, subTarget);
+            } else {
+                switch (action) {
+                    case 'train':
+                        modSkill(4 + Math.floor(Math.random() * 3));
+                        modLife(3);
+                        actionLog = "✨ 泡在练习室一整天，汗水浇灌实力。技能提升！";
+                        break;
+                    case 'cp':
+                        if (!subTarget) return;
+                        let target = subTarget,
+                            favDelta = 0,
+                            soloD = 0,
+                            cpD = 0,
+                            groupD = 0;
+                        const isZX_SXH = (game.playerId === 'zx' && target === 'sxh') || (game.playerId === 'sxh' &&
+                            target === 'zx');
+                        const isZB_ZJ = (game.playerId === 'zby' && target === 'zj') || (game.playerId === 'zj' &&
+                            target === 'zby');
+                        const isZBY_SXH = (game.playerId === 'zby' && target === 'sxh') || (game.playerId === 'sxh' &&
+                            target === 'zby');
+                        storyText = getStory(game.playerId, target);
+                        game.cpCounts[target] = (game.cpCounts[target] || 0) + 1;
+
+                        if ((game.playerId === 'zby' && target === 'sxh' && game.cpCounts['sxh'] >= 6) || (game
+                                .playerId === 'sxh' && target === 'zby' && game.cpCounts['zby'] >= 6)) {
+                            game.gameOver = true;
+                            renderEndingScreen('我磕了对家x我的cp');
+                            return;
+                        }
+
+                        if (isZX_SXH) { favDelta = 8;
+                            soloD = -5;
+                            cpD = 1;
+                            groupD = -1;
+                            actionLog = "💔 和" + (game.playerId === 'zx' ? '苏新皓' : '朱志鑫') + "互动，唯粉撕碎cp图，粉丝总数下降..."; } else if (
+                            isZB_ZJ) {
+                            if (game.coldWarRemain > 0) { favDelta = -8;
+                                soloD = -4;
+                                cpD = -6;
+                                groupD = -1;
+                                actionLog = "💔 冷战中心碎互动，粉丝心碎一地。"; } else { favDelta = 5;
+                                soloD = -1;
+                                cpD = 6;
+                                groupD = 1;
+                                actionLog = "💞 破冰互动！美帝姐狂喜，cp粉暴增。"; }
+                        } else if (isZBY_SXH) { favDelta = 2;
+                            soloD = -3;
+                            cpD = 0;
+                            groupD = 4;
+                            actionLog = "🌱 冒险配对，唯粉震怒，但团粉觉得团结有爱。"; } else { favDelta = 4;
+                            soloD = -1;
+                            cpD = 4;
+                            groupD = 1;
+                            actionLog = "💫 温馨互动，新奇感拉满，cp粉悄悄上涨。"; }
+
+                        modFavor(target, favDelta);
+                        modFanStruct(soloD, cpD, groupD);
+
+                        if (game.playerId === 'zx') {
+                            if (target !== 'sxh') game.zx_noSuCounter++;
+                            else game.zx_noSuCounter = 0;
+                            if (game.zx_noSuCounter >= 2) { triggerZXLetter();
+                                actionLog += " ✉ 苏新皓写了一封信，你心情低落。"; }
+                        }
+                        if (game.playerId === 'sxh') {
+                            if (target !== 'zx') game.sxh_noZxCounter++;
+                            else game.sxh_noZxCounter = 0;
+                            if (game.sxh_noZxCounter >= 2) { triggerSXHVisit();
+                                actionLog += " 🌙 朱志鑫半夜来访，气氛微妙。"; }
+                        }
+
+                        if (game.cpCounts[target] >= 6) {
+                            if (checkRumorTrigger(target, true)) { game.rumorTriggered = true;
+                                game.gameOver = true;
+                                renderEndingScreen('同性恋传闻爆发'); return; }
+                        } else {
+                            if (checkRumorTrigger(target, false)) { game.rumorTriggered = true;
+                                game.gameOver = true;
+                                renderEndingScreen('同性恋传闻爆发'); return; }
+                        }
+                        break;
+
+                    case 'sabotage':
+                        let success = Math.random() > 0.4;
+                        if (success) {
+                            let keys = Object.keys(game.relation),
+                                chosen = keys[Math.floor(Math.random() * keys.length)];
+                            game.relation[chosen] = Math.max(0, game.relation[chosen] - Math.floor(Math.random() * 8 +
+                            5));
+                            game.sabotageSuccess++;
+                            actionLog = `🕯️ 成功离间！某一对队友关系恶化，你深藏功与名。(成功${game.sabotageSuccess}次)`;
+                            modLife(-1);
+                        } else {
+                            actionLog = "😓 离间失败，被怀疑了，队友对你产生隔阂。";
+                            let randomMate = ['zx', 'zby', 'zj', 'zh', 'sxh'].find(m => m !== game.playerId);
+                            modFavor(randomMate, -3);
+                            modLife(-2);
+                        }
+                        break;
+                    case 'sj':
+                        let feel = Math.random() > 0.5 ? "粉丝夸你可爱，心情大好" : "黑帖让人失眠";
+                        modLife(feel.includes('大好') ? 2 : -2);
+                        modFanStruct(Math.floor(Math.random() * 3) - 1, Math.floor(Math.random() * 3) - 1, Math.floor(
+                            Math.random() * 3) - 1);
+                        actionLog = `📱 深夜视奸粉圈... ${feel}`;
+                        break;
+                }
+            }
+
+            game.soloFans = Math.min(100, Math.max(0, game.soloFans));
+            game.cpFans = Math.min(100, Math.max(0, game.cpFans));
+            game.groupFans = Math.min(100, Math.max(0, game.groupFans));
+            recalcFansFromStruct();
+
+            let eventInfo = advanceWeek(true);
+            if (eventInfo) actionLog += `  【${eventInfo.name}】${eventInfo.desc}`;
+
+            game.lastAction = action;
+            game.lastTarget = subTarget;
+
+            let finalMsg = actionLog;
+            if (action === 'cp' && storyText) finalMsg = storyText + "\n\n" + actionLog;
+
+            let ending = checkEnding();
+            if (game.gameOver && ending) { renderGameOverScreen("💔游戏结束：" + ending); return; }
+            if (game.week > 16) { renderEndingPreview(finalMsg); } else { renderMainGame(finalMsg); }
+        }
+
+        function triggerZXLetter() { modLife(-3);
+            modFanStruct(-1, 0, 0);
+            game.zx_noSuCounter = 0; }
+
+        function triggerSXHVisit() { modLife(-3);
+            modFanStruct(-1, 0, 0);
+            game.sxh_noZxCounter = 0; }
+
+        /* ============================================================
+           渲染函数
+        ============================================================ */
+        function statsHTML() {
+            return `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">❤️ 生命值</div>
+                <div class="stat-value">${game.life}</div>
+                <div class="stat-bar"><div class="bar-fill fill-health" style="width:${game.life}%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🎤 技　能</div>
+                <div class="stat-value">${game.skill}</div>
+                <div class="stat-bar"><div class="bar-fill fill-skill" style="width:${game.skill}%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🤝 接　纳</div>
+                <div class="stat-value">${game.teamAccept}</div>
+                <div class="stat-bar"><div class="bar-fill fill-accept" style="width:${game.teamAccept}%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">👑 粉　丝</div>
+                <div class="stat-value">${game.fans}</div>
+                <div class="stat-bar"><div class="bar-fill fill-fans" style="width:${game.fans}%"></div></div>
+            </div>
+        </div>`;
+        }
+
+        function renderMainGame(extraMessage = "") {
+            const root = document.getElementById('root');
+            let msg = extraMessage || `✨ 第${game.week}周 · 新的一周，新的选择。`;
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('TOP · 卖腐模拟器')}
+            <div class="game-inner">
+                <div class="meta-bar">
+                    <span class="role-tag">▶ ${game.playerName}</span>
+                    <span class="week-tag">WEEK ${game.week} / 16</span>
+                </div>
+                ${makeWeekPips(game.week)}
+                <div class="deco-strip">★ ♥ ● ✿ ◆ ～ ★ ♥ ● ✿ ◆ ～ ★ ♥ ●</div>
+                <div class="story-panel" style="margin-top:8px">
+                    <div class="story-text">${msg.replace(/\n/g,'<br>')}</div>
+                </div>
+                ${statsHTML()}
+                <div class="divider"></div>
+                <div class="action-buttons">
+                    <button class="action-btn" data-action="train">✦刻苦训练✦</button>
+                    <button class="action-btn" data-action="cp">✦找队友卖腐✦</button>
+                    <button class="action-btn" data-action="sabotage">✦离间队友✦</button>
+                    <button class="action-btn" data-action="sj">✦视奸粉圈✦</button>
+                </div>
+            </div>
+            <footer>✦每一步改变命运✦</footer>
+        </div>`;
+            document.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    let act = btn.dataset.action;
+                    if (act === 'cp') renderTeammateSelect();
+                    else performAction(act);
+                });
+            });
+        }
+
+        function renderTeammateSelect() {
+            const root = document.getElementById('root');
+            const teammates = ['zx', 'zby', 'zj', 'zh', 'sxh'].filter(id => id !== game.playerId);
+            const nameMap = { zx: '✦朱志鑫✦', zby: '✦张泽禹✦', zj: '✦张极✦', zh: '✦左航✦', sxh: '✦苏新皓✦' };
+            const iconMap = { zx: '', zby: '', zj: '', zh: '', sxh: '' };
+            let btns = teammates.map(id => `<button class="teammate-btn" data-target="${id}">${iconMap[id]} ${nameMap[id]}</button>`)
+                .join('');
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('SELECT · PARTNER')}
+            <div class="game-inner">
+                <div class="deco-strip" style="margin:10px 0 4px">♥ ★ ✿ ● ◆ ～ ♥ ★ ✿ ● ◆ ～</div>
+                <div class="story-panel">
+                    <div class="story-text"> 选择一位队友，开启专属互动剧情
+<span style="font-size:0.78rem;color:var(--pink-4)">每次选择都至关重要❗️</span></div>
+                </div>
+                <div class="teammate-grid" style="margin-top:12px">
+                    ${btns}
+                    <button class="teammate-btn back-btn" style="grid-column:span 2">← 返回</button>
+                </div>
+            </div>
+            <footer>★ ♥ ✿ ● ◆ ～ ★ ♥ ✿ ● ◆ ～ ★</footer>
+        </div>`;
+            document.querySelectorAll('[data-target]').forEach(btn => {
+                btn.addEventListener('click', () => performAction('cp', btn.dataset.target));
+            });
+            document.querySelector('.back-btn')?.addEventListener('click', () => renderMainGame());
+        }
+
+        function renderEndingPreview(finalMsg) {
+            const root = document.getElementById('root');
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('FINAL WEEK · 旅程结束')}
+            <div class="game-inner">
+                <div class="meta-bar">
+                    <span class="role-tag">▶ ${game.playerName}</span>
+                    <span class="week-tag">WEEK 16 / 16</span>
+                </div>
+                ${makeWeekPips(17)}
+                <div class="deco-strip">★ ♥ ✿ ● ◆ ～ ★ ♥ ✿ ● ◆ ～ ★ ♥ ●</div>
+                <div class="story-panel" style="margin-top:8px">
+                    <div class="story-text">${finalMsg.replace(/\n/g,'<br>')}</div>
+                </div>
+                ${statsHTML()}
+                <div style="padding:16px 0 4px;text-align:center">
+                    <button class="preview-btn" id="viewEndingBtn">◆ 查看最终结局 ◆</button>
+                </div>
+            </div>
+            <footer>点击解锁你的命运</footer>
+        </div>`;
+            document.getElementById('viewEndingBtn')?.addEventListener('click', () => {
+                let end = checkEnding();
+                renderEndingScreen(end);
+            });
+        }
+
+        function renderEndingScreen(ending) {
+            const root = document.getElementById('root');
+            const endingTexts = {
+                "身体不适退团": "练习室的灯还亮着，你却再也站不起来了。",
+                "卖腐丧志": "你忘了初心，只剩下营业的躯壳。",
+                "霸凌全团": "孤岛之上，再无人愿意与你对视。",
+                "无人在意": "超话长草，粉丝群解散，无人问津。",
+                "平稳着陆": "组合解散那天，你们笑着唱完最后一首歌，前程似锦。",
+                "全能ACE": "聚光灯为你加冕，你是真正的TOP！",
+                "平淡是真": "岁月静好，你成了练习生们最爱的舞蹈老师。",
+                "真爱永恒": "你们五人的羁绊比家人更深，彼此守护，无人能拆散。",
+                "我磕了对家x我的cp": "千言万语化作一句：陪！",
+                "皇子登基": "你是老板亲选的皇族，却活在虚假的数据泡沫里……公司改朝换代后，查无此人。",
+                "美帝姐的胜利": "你们成了真正美帝，双人卡炒到天价，可你分不清镜头前是真心还是营业。",
+                "端水之神降临": "牵手勾肩公主抱，你熟练运用身体和眼神制造了各种惊天神药。午夜梦回，你却突然想不起十几岁被问到最好朋友的名字时为什么心脏会停跳一秒。",
+                "钮祜禄": "你操控了整个粉圈，如今功成身退，成为某娱乐公司营销总监。",
+                "同性恋传闻爆发": "过于亲密被私生拍到，舆论失控……公司紧急声明后却收效甚微，遗憾告别。"
+            };
+            const endingEmoji = {
+                "身体不适退团": "💔",
+                "卖腐丧志": "🎭",
+                "霸凌全团": "👥",
+                "无人在意": "🍂",
+                "平稳着陆": "🏆",
+                "全能ACE": "✨",
+                "平淡是真": "🥬",
+                "真爱永恒": "💞",
+                "我磕了对家x我的cp": "💘",
+                "皇子登基": "👑",
+                "美帝姐的胜利": "💖",
+                "端水之神降临": "💖",
+                "钮祜禄": "🐍",
+                "同性恋传闻爆发": "⚠️"
+            };
+            let body = endingTexts[ending] || '';
+            let emoji = endingEmoji[ending] || '★';
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('ENDING · 命运降临')}
+            <div class="game-inner">
+                <div class="deco-strip" style="margin:12px 0 8px">♥ ★ ✿ ● ◆ ～ ♥ ★ ✿ ● ◆ ～</div>
+                <div class="story-panel">
+                    <div class="story-text">
+                        <div class="ending-title">${emoji} ${ending} ${emoji}</div>
+                        ${body ? `<div class="ending-body" style="margin-top:10px">${body}</div>` : ''}
+                    </div>
+                </div>
+                <div class="deco-strip" style="margin:10px 0">★ ♥ ✿ ● ◆ ～ ★ ♥ ✿ ● ◆ ～</div>
+                <div style="padding:4px 0 8px;text-align:center">
+                    <button class="restart-btn" id="restartEndBtn">★ 重新出道 ★</button>
+                </div>
+            </div>
+            <footer>感谢你走过这段偶像旅程</footer>
+        </div>`;
+            document.getElementById('restartEndBtn')?.addEventListener('click', () => chooseRoleScreen());
+        }
+
+        function renderGameOverScreen(msg) {
+            const root = document.getElementById('root');
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('GAME OVER')}
+            <div class="game-inner">
+                <div class="deco-strip" style="margin:12px 0 8px">♥ ★ ✿ ● ◆ ～ ♥ ★ ✿ ● ◆ ～</div>
+                <div class="story-panel">
+                    <div class="story-text">✗ ${msg}<br><br>游戏结束。</div>
+                </div>
+                <div style="padding:16px 0 8px;text-align:center">
+                    <button class="restart-btn" id="restartBtn">★ 重新开始 ★</button>
+                </div>
+            </div>
+            <footer>★ ♥ ✿ ● ◆ ～ ★ ♥ ✿</footer>
+        </div>`;
+            document.getElementById('restartBtn')?.addEventListener('click', () => chooseRoleScreen());
+        }
+
+        /* ============================================================
+           首页角色选择 — 标题背景块保持紧凑，角色按钮更小更松散
+        ============================================================ */
+        function chooseRoleScreen() {
+            const root = document.getElementById('root');
+            const nameMap =  { zx: '✦朱志鑫✦', zby: '✦张泽禹✦', zj: '✦张极✦', zh: '✦左航✦', sxh: '✦苏新皓✦' };
+            const subMap = { zx: '', zby: '', zj: '', zh: '', sxh: '' };
+            const iconMap = { zx: '', zby: '', zj: '', zh: '', sxh: '' };
+
+            // 角色按钮：使用内联样式调小尺寸，同时保留类名以便 CSS 覆盖
+            let btns = Object.keys(roles).map(id => `
+            <button class="teammate-btn" data-role="${id}">
+                <span class="role-icon" style="display:block;font-size:0.9rem;color:var(--pink-4);margin-bottom:1px">${iconMap[id]}</span>
+                <span class="role-name" style="font-size:0.8rem;display:block;font-weight:700;color:var(--pink-5)">${nameMap[id]}</span>
+                <span class="role-sub" style="display:block;font-size:0.5rem;color:var(--pink-3);letter-spacing:0.5px;margin-top:1px">${subMap[id]}</span>
+            </button>`).join('');
+
+            root.innerHTML = `
+        <div class="game-container">
+            ${makeWindowTitlebar('TOP · START')}
+            <div class="game-inner">
+                <!-- 角色选择标题 — 保持用户之前的紧凑调整 -->
+                <div class="story-panel role-select-title">
+                    <div class="story-text">
+                        <div class="home-title">
+  <br>  
+                            <span class="main-jp">✦ TOP登陆少年 ✦</span>
+  <br>  
+                            <span class="sub">选择你的身份，开启七年的梦想延续</span>
+  <br>  
+                        </div>
+                    </div>
+                </div>
+                <!-- 装饰条 — 使用专用类增加间距 -->
+                <div class="deco-strip role-select-deco">★ ♥ ✿ ● ◆ ～ ★ ♥ ✿ ● ◆ ～ ★ ♥</div>
+                <!-- 角色网格 — 使用 role-select-grid 让按钮更小、间距更大 -->
+                <div class="teammate-grid role-select-grid">
+                    ${btns}
+                </div>
+                <footer>✦ 请谨慎做出每一次选择 ✦</footer>
+            </div>
+        </div>`;
+
+            document.querySelectorAll('[data-role]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    let role = btn.dataset.role;
+                    initGame(role);
+                    const initStories = {
+                        zx: '出道发布会的聚光灯亮得晃眼，你站在舞台最中央，心跳快得像要冲出胸腔。七年练习生生涯，从山城到更大的舞台，你走了很久很久。台下的欢呼声此起彼伏，你握紧话筒，知道这只是开始。',
+                        zby: '拿着麦站在出道舞台上的时候，你突然想起了小时候第一次拿起话筒的样子。从哈尔滨到重庆，再到北京，到马来西亚，一路漂洋过海，你始终带着那把吉他。台下粉丝大声呼喊着你的名字，盖过了其他所有声音，却始终无法覆盖掉你心里那份隐隐的不安。',
+                        zj: '镜头扫过来时，你露出了标准的微笑，幸福充满了你的胸膛。出道后的日子会是什么样呢？演唱会该去哪开？你努力想要看清某一个台下挥舞荧光棒的粉丝，不知道她是不是和你一样幸福，一样期待着那个模糊又璀璨的未来。',
+                        zh: '站在出道队伍里，你分不清自己此刻真实的情绪，只知道这并不是一种完全意义上的开心。旧伤时不时会疼，你努力克制住自己心里那股莫名的冲动，没什么值得珍惜，更没什么值得失去。',
+                        sxh: '从开始到现在，你比谁都清楚自己到底经历了什么。七年里的日日夜夜，有过高峰也有过低谷，欢欣和泪水都变得模糊起来。最重要的是你终于陪自己走到了这里，未来还很长，往前走，别回头。'
+                    };
+                    renderMainGame(initStories[role] || '');
+                });
+            });
+        }
+
+        chooseRoleScreen();
+    </script>
+</body>
+</html>
